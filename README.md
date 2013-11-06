@@ -29,7 +29,7 @@ popular, I may make customization easier.
 		<td>30</td><td>black</td><td>40</td><td>black background</td>
 	</tr>
 	<tr>
-		<td>31</td><td>red</td><td></td><td>41</td><td>red background</td>
+		<td>31</td><td>red</td><td>41</td><td>red background</td>
 	</tr>
 	<tr>
 		<td>32</td><td>green</td><td>42</td><td>green background</td>
