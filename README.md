@@ -26,28 +26,28 @@ it's so complicated, but I wrote this for myself; if this project becomes
 popular, I may make customization easier.
 <table>
 	<tr>
-		<td>30</td><td>black<td></td>40<td></td>black background</td>
+		<td>30</td><td>black</td><td>40</td><td>black background</td>
 	</tr>
 	<tr>
-		<td>31</td><td>red<td></td><td></td>41<td></td>red background</td>
+		<td>31</td><td>red</td><td></td><td>41</td><td>red background</td>
 	</tr>
 	<tr>
-		<td>32<td></td>green<td></td>42<td></td>green background</td>
+		<td>32</td><td>green</td><td>42</td><td>green background</td>
 	</tr>
 	<tr>
-		<td>33<td></td>yellow<td></td>43<td></td>yellow background</td>
+		<td>33</td><td>yellow</td><td>43</td><td>yellow background</td>
 	</tr>
 	<tr>
-		<td>34<td></td>blue<td></td>44<td></td>blue background</td>
+		<td>34</td><td>blue</td><td>44</td><td>blue background</td>
 	</tr>
 	<tr>
-		<td>35<td></td>magenta<td></td>45<td></td>magenta background</td>
+		<td>35</td><td>magenta</td><td>45</td><td>magenta background</td>
 	</tr>
 	<tr>
-		<td>36<td></td>cyan<td></td>46<td></td>cyan background</td>
+		<td>36</td><td>cyan</td><td>46</td><td>cyan background</td>
 	</tr>
 	<tr>
-		<td>37<td></td>white<td></td>47<td></td>white background</td>
+		<td>37</td><td>white</td><td>47</td><td>white background</td>
 	</tr>
 </table>
 
