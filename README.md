@@ -24,14 +24,32 @@ a different value (0 = normal, 1 = bold, 2 = faint). For other possible
 format values, see http://en.wikipedia.org/wiki/ANSI_escape_code.) Sorry
 it's so complicated, but I wrote this for myself; if this project becomes
 popular, I may make customization easier.
-	30: black	40: black background
-	31: red		41: red background
-	32: green	42: green background
-	33: yellow	43: yellow background
-	34: blue	44: blue background
-	35: magenta	45: magenta background
-	36: cyan	46: cyan background
-	37: white	47: white background
+<table>
+	<tr>
+		<td>30</td><td>black<td></td>40<td></td>black background</td>
+	</tr>
+	<tr>
+		<td>31</td><td>red<td></td><td></td>41<td></td>red background</td>
+	</tr>
+	<tr>
+		<td>32<td></td>green<td></td>42<td></td>green background</td>
+	</tr>
+	<tr>
+		<td>33<td></td>yellow<td></td>43<td></td>yellow background</td>
+	</tr>
+	<tr>
+		<td>34<td></td>blue<td></td>44<td></td>blue background</td>
+	</tr>
+	<tr>
+		<td>35<td></td>magenta<td></td>45<td></td>magenta background</td>
+	</tr>
+	<tr>
+		<td>36<td></td>cyan<td></td>46<td></td>cyan background</td>
+	</tr>
+	<tr>
+		<td>37<td></td>white<td></td>47<td></td>white background</td>
+	</tr>
+</table>
 
 The battery display shows the current percentage and either a Z for "AC
 plugged in" (it looks kinda like lightning, right?) or an I for "AC
@@ -47,9 +65,3 @@ BUGS:
 	
 	* When the cursor is on one of the top two lines, backspacing may
 	 temporarily cause the display line to disappear.
-=======
-batcheck
-========
-
-Battery life and time in Linux terminal
->>>>>>> 74686b0122e0b320d5e381d2f1a5bc8d0ff51578
