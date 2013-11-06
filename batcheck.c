@@ -81,6 +81,19 @@ int main (int argc, char **argv) {
 		fputs ("Error, invalid argument.\n", stderr);
 		return -1;
 	} else {
+		/* pid_t is just an int, but since this can be
+		 * system-dependent, using pid_t instead is a little
+		 * safeguard.
+		 *
+		 * daemon() basically just calls fork(), then, upon
+		 * success, _exit(2). Arguments are int nochdir (if 1,
+		 * PWD=$PWD; if 0, PWD=/) and int noclose (if 1, no
+		 * change, if 0 redirect stdout and stderr to
+		 * /dev/null). All the files called use absolute
+		 * referencing, so I don't care about the working
+		 * directory, but the whole POINT of this is output, so I
+		 * don't want stdout to redirect to /dev/null.
+		 * */
 		pid_t pid = daemon (0, 1);
 		if (pid == -1) {
 			fprintf (stderr, "Can't fork process: %s\n",
