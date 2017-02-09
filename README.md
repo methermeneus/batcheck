@@ -55,13 +55,17 @@ The battery display shows the current percentage and either a Z for "AC
 plugged in" (it looks kinda like lightning, right?) or an I for "AC
 unplugged" (looks kinda like a battery, I guess).
 
-BUGS:
+BUGS/TODO:
 ----
-	* In Vim, sometimes the foreground and background colors switch.
+- [ ] In Vim, sometimes the foreground and background colors switch.
 
-	* I didn't write any code to clear previously written lines, so
+- [ ] I didn't write any code to clear previously written lines, so
 	 when scrolling upwards, extra (unchanging) lines may be left
 	 behind.
 	
-	* When the cursor is on one of the top two lines, backspacing may
+- [ ] When the cursor is on one of the top two lines, backspacing may
 	 temporarily cause the display line to disappear.
+
+- [ ] Man, do I have a lot of comments, and badly-formatted ones at that. I still actually
+	use this program, but it's weird to see how little I knew about C and code formatting
+	back then. This needs fixing, even if it has nothing to do with the program itself.
