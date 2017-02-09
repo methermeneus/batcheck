@@ -69,3 +69,23 @@ BUGS/TODO:
 - [ ] Man, do I have a lot of comments, and badly-formatted ones at that. I still actually
 	use this program, but it's weird to see how little I knew about C and code formatting
 	back then. This needs fixing, even if it has nothing to do with the program itself.
+
+```
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAABAgAGBQJYm+mSAAoJECzE45aCeCKZtvQP/AgcBOSra58hDhYiNpOUvDN8
+sVADViGSX37Z2xh+NfnIpA8uYPHpO8GN84o8Y4xRqqc7JQPWDC6wm7JG1mwRIFCo
+3SGfE8q+zLCj9hZXNCjPUe0ICQ/8pklRY4DYfsKoES59cg94IO9LSKgAkpbh2kxw
+YRF9V3SZT+yRER/TSLFvPoi6z0pyHX/FYHtQrKgeh+k9S3y8ScKMmWJI6NFtIIWB
+Z+D5GI9KPnTqmLN2OwWAqWq0DKO9es+lGw2BLuKYnds09iBLn9ASdOAIy7FweuEW
+qFW51TESuKZ9j0QMOnwgoConEIjHL2lLon0x1OMOaIw3AmvfjR+VEVCHYbNhNG5t
+cd8j3ln2nQVWBo2BCwa80KFgqSgsT1hH2PhrSPCQdR0QM6ZCKr0ooJaSMbNcYhV4
+vSLKFQiy1us91FwHO/WBkEFyrpOWh+LrtAu5Vt8Tza1y0uVzX2J+kVZdA0Rd8WGn
+Zo95GwlUqVAscGJYYsfrs/Hk2VvJhJSV2FGCNgOwizGSXSMAbpaVvwhMwZEu4DxO
+II3aWtsMvKwuk1i9UyCtK0UaTILmTmByEHxjfLZPENTsFvpxD4UfB20dfKUU3+1i
+JCwfCb/NnT0Q1f9q1voAKaXxVIGIX/ATLvgSOvPJOEU2dFYz7vQfEwCRd46ocoOo
+EJfCFufxOyRBZsY+esra
+=axyy
+-----END PGP SIGNATURE-----
+```
