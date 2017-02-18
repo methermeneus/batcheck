@@ -22,7 +22,7 @@
  *		and wanted to be sure I could remember what I was doing.
  *
  *        Version:  1.0
- *        Created:  11/05/2013 09:15:23 PM
+ *        Created:  2008
  *       Revision:  none
  *       Compiler:  gcc
  *
