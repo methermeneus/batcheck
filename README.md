@@ -1,7 +1,8 @@
 batcheck
 ========
 Linux terminal display for laptop battery life and time.
-(c) November 2013 R. A. Grant
+(c) November 2008 R. A. Grant
+uploaded to GitHub November 2013
 Released under GPL v. 2
 
 Displays time and laptop battery life in upper right hand corner of the
