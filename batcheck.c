@@ -62,6 +62,11 @@ void check (
 
 int main (int argc, char **argv) {
 	if (((argc > 1) && (argv[1][0] == '-')) && (argv[1][1] == 'h')) {
+		// @TODO: I don't even... This is so hacky, and I'll probably just wipe
+		// out the whole commandline arguments thing entirely for such a
+		// simple program (or give it enough utility that commandline
+		// arguments are worthwhile), but for now it's not really even
+		// used, so just leave the dang thing. -RAG, Feb 2017
 		/* if "batcheck -h", return a help dialogue */
 		puts ("Batcheck (c) 2013 R. A. Grant.");
 		puts ("Usage: \"batcheck [-option]\"");
@@ -94,6 +99,8 @@ int main (int argc, char **argv) {
 		 * directory, but the whole POINT of this is output, so I
 		 * don't want stdout to redirect to /dev/null.
 		 * */
+
+		// @TODO: Proper error checking and output. -RAG Feb 2017
 		pid_t pid = daemon (0, 1);
 		if (pid == -1) {
 			fprintf (stderr, "Can't fork process: %s\n",
@@ -101,6 +108,8 @@ int main (int argc, char **argv) {
 			return 1;
 		}
 		if (!pid) {
+			// @TODO: Okay, this is getting ridiculous. Cleanup comments,
+			// seriously. -RAG, Feb 2017
 			/* Let's add time to this. */
 			/* Unfortunately, we need a few intermediate
 			* steps. */
@@ -123,17 +132,17 @@ int main (int argc, char **argv) {
 			int x;
 			/* Color value */
 			int color = 36;
-			char *max = "/sys/class/power_supply/BAT0/charge_full";
-			char *now = "/sys/class/power_supply/BAT0/charge_now";
-			char *ac = "/sys/class/power_supply/AC/online";
+			const char *maxChargePath = "/sys/class/power_supply/BAT0/charge_full";
+			const char *currentChargePath = "/sys/class/power_supply/BAT0/charge_now";
+			const char *isACPath = "/sys/class/power_supply/AC/online";
 			char output[6]; /*  output 5 chars (+ \0): 100%Z
 					*  Will use leading spaces. Z = charging (looks like
 					*  lightning); I = battery (looks like a battery)
 					*/
 			
-			char read_max[8];  /*store number from the file as a string
+			char maxCharge[8];  /*store number from the file as a string
 					File contains a 7-digit (char) number*/
-			char read_now[8];
+			char currentCharge[8];
 	
 			while (1) {
 				/* put formatted time into nowtime_str */
@@ -151,7 +160,12 @@ int main (int argc, char **argv) {
 	
 				/* Get info from files and convert it to the
 				* output string. */
-				check (output, max, read_max, now, read_now, ac);
+				// @TODO: Pull some of this out of the function so it
+				// only has to execute once? If max changes between
+				// loops, there's a hardware problem. (Of course, that
+				// happened on the laptop I was using when I wrote
+				// this...) -RAG Feb 2017
+				check (output, maxChargePath, maxCharge, currentChargePath, currentCharge, isACPath);
 				/*  Now that it displays on stdout rather than
 				*  just on the command line, I don't need to put
 				*  it in a file. It'll be there no matter what I
@@ -164,19 +178,28 @@ int main (int argc, char **argv) {
 		*********************************************************/
 // Xterm uses TIOCGWINSIZE; tty uses TIOCGSIZE.
 // If neither, we've got a problem.
+// @NOTE: Maybe move #ifdef TIOCGSIZE out? TTY won't change size.
+// TIOCGWINSZ needs to stay here, though, since terminal emulators can
+// change size. -RAG Feb 2017
 #ifdef TIOCGWINSZ
 				ioctl (1, TIOCGWINSZ, &xy); // find terminal size
 #elif defined TIOCGSIZE
 				ioctl (1, TIOCGSIZE, &xy);
 #else
-				fputs ("Error, cannot find terminal size.");
+				fputs ("Error, cannot find terminal size.", stderr);
+				exit (-1); // @TODO: Exit condition documentation. -RAG Feb 2017
 #endif
 				/* Time string is 21 chars long (including
 				* brackets). We want it to display in the upper
 				* right hand corner.
 				*/
+				// @TODO: Feels magic-number-y. #define
+				// TIME_STRING_LENGTH 21, maybe? -RAG Feb 2017
 				x = xy.ws_col - 21;
 				
+				// @NOTE: Okay, this sort of thing is a bit of a problem
+				// in C, I'll admit it. Keep this explanation block,
+				// maybe fix the formatting. -RAG Feb 2017
 				/********************************************************
 				*		BREAKDOWN:				*
 				* \033 = ESC						*
@@ -196,14 +219,16 @@ int main (int argc, char **argv) {
 				********************************************************/
 				fprintf (stdout, "\0337\033[1;%dm\033[%d;%dH[%s]",
 					color, 1, x, nowtime_str);
+				// text format 1, color 36 (cyan), first line( from top), xth column (from right), string
 				/* Next row; adding 8 to the column approximately centers
 				* battery output under the time.*/
 				fprintf (stdout, "\033[%d;%dH[%s]\033[0m\0338", 2, x + 8, output);
+				// second line (from top), xth column (from right), output, return to saved cursor position and format.
 				/*  if we don't flush the buffer, nothing outputs
 				*  before we sleep.
 				*/
 				fflush (stdout);
-				/* If we don't sleep, we thrash. There's no
+				/* If we don't sleep, we get weird errors. There's no
 				* reason for the display to update more than
 				* once per second anyway. 
 				*/
@@ -216,24 +241,23 @@ int main (int argc, char **argv) {
 	}
 }
 	
-void check (
-	char* output,
-	char* max,
-	char* read_max,
-	char* now,
-	char* read_now,
-	char* ac)
-{
+void check (char* output, char* maxChargePath, char* maxCharge, char* currentChargePath, char* currentCharge, char* isAC) {
+	// @TODO: Definitely don't need to pass all of this. This program is
+	// so small and only has a one-second resolution, there's no
+	// appreciable system overhead to making new variables to get the
+	// file contents every loop. Also, not really much point in factoring
+	// out check(); may as well do all of this inside the original while
+	// loop. -RAG Feb 2017
 	/* These characters are the same no matter what. */
-	*(output + 3) = '%';
-	*(output + 5) = '\0';
+	//*(output + 3) = '%';
+	//*(output + 5) = '\0';
 
-	FILE *max_charge; /* read from /sys/class/power_supply/BAT0/charge_full */
-	float max_flt; /* store number converted from string to float */
+	FILE *maxChargeFile; /* read from /sys/class/power_supply/BAT0/charge_full */
+	float maxChargeFloat; /* store number converted from string to float */
 
 	/* Same thing with current charge instead of max. */
-	FILE *current_charge;
-	float now_flt;
+	FILE *currentChargeFile;
+	float currentChargeFloat;
 
 	FILE *adapter;
 	char ac_flag; /* only one char, so convert directly to int flag */
@@ -241,28 +265,36 @@ void check (
 	int percent;
 
 	/* Read in relevant strings from the files. */
-	max_charge = fopen (max, "r");
-	fgets (read_max, 8, max_charge);
-	fclose (max_charge);
-	max_flt = atof (read_max);
+	maxChargeFile = fopen (maxChargePath, "r");
+	fgets (maxCharge, 8, maxChargeFile);
+	fclose (maxChargeFile);
+	maxChargeFloat = atof (maxCharge);
 
-	current_charge = fopen (now, "r");
-	fgets (read_now, 8, current_charge);
-	fclose (current_charge);
-	now_flt = atof (read_now);
+	currentChargeFile = fopen (currentChargePath, "r");
+	fgets (currentCharge, 8, currentChargeFile);
+	fclose (currentChargeFile);
+	currentChargeFloat = atof (currentCharge);
 
-	/* now_flt shouldn't ever be greater than max_flt, but I believe
-	 * in covering all my bases. Regardless, if this is the case,
-	 * we're at 100%, and it's cheaper to assign 100 than to do any
+	/* currentChargeFloat shouldn't ever be greater than maxChargeFloat,
+	 * but I believe in covering all my bases. Regardless, if this is the
+	 * case, we're at 100%, and it's cheaper to assign 100 than to do any
 	 * calculations.*/
-	if (now_flt >= max_flt) {
+	// @NOTE: At the expense of a branch? If this had actually needed to
+	// be performent code, I'd find a way to go back in time and smack
+	// myself upside the head.
+	if (currentChargeFloat >= maxChargeFloat) {
 		percent = 100;
 	} else {
 		/* Otherwise, calculate the percentage, then convert to
 		 * an int. */
+		// @TODO: Maybe just do all the conversion and calculation on one
+		// line instead of storing the floats? A matter of style more
+		// than anything else. -RAG Feb 2017
 		percent = (int) ((now_flt / max_flt) * 100);
 	}
-
+	
+	// @TODO: My stupid past self apparently couldn't use sprintf with
+	// format modifiers. Definitely gotta fix this one now. -RAG Feb 2017
 	/* Easiest way I could think of to do leading spaces was this if
 	 * statement. Direct assignment is cheaper and easier than
 	 * calculating, so that's what I did for 100. Else, I took
@@ -272,6 +304,7 @@ void check (
 	 * I want int 0 to become char '0'), so I took the liberty of
 	 * directly adding 48 to the values to get to the right place in
 	 * the ASCII chart.*/
+	/*
 	if (percent == 100) {
 		*output = '1';
 		*(output + 1) = '0';
@@ -284,16 +317,17 @@ void check (
 		*output = ' ';
 		*(output + 1) = ' ';
 		*(output + 2) = (char) (percent + 48);
-	}
+	}*/
 	
 	/* Is the computer plugged in? */
 	adapter = fopen (ac, "r");
 	ac_flag = fgetc (adapter) - 48;
 	fclose (adapter);
-
-	if (ac_flag == 1) {
-		*(output + 4) = 'Z';
-	} else {
-		*(output + 4) = 'I';
-	}
+	char suffix = (ac_flag? 'Z' : 'I');
+	snprintf (output, 6, "%-3d%%%c", percent, suffix);
+	//if (ac_flag == 1) {
+		//*(output + 4) = 'Z';
+	//} else {
+		//*(output + 4) = 'I';
+	//}
 }
