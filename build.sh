@@ -8,16 +8,16 @@ LDFLAGS=
 debug=0
 platform="laptop"
 output="batcheck"
-dset=
-oset=
-pset=
+dset="false"
+oset="false"
+pset="false"
 
 # @TODO: Help message?
 
-while getopts do:p:h options; do
+while getopts ":dp:ho:" options; do
 	case $options in
 		d)
-			if [[ ! -z $dset ]]; then
+			if [[ $dset == "true" ]]; then
 				echo "Error: option $OPTARG set multiple times." >&2
 				exit -1
 			fi
@@ -26,32 +26,33 @@ while getopts do:p:h options; do
 			CFLAGS=-Wall
 			;;
 		o)
-			if [[ ! -z $oset ]]; then
+			if [[ $oset == "true" ]]; then
 				echo "Error: output set multiple times." >&2
 				exit -2
 			fi
 			oset="true"
-			output="$2"
-			shift
+			output="$OPTARG"
 			echo "Building as $output."
 			;;
 		p)
-			if [[ ! -z $pset ]]; then
+			if [[ $pset == "true" ]]; then
 				echo "Error: platform set multiple times." >&2
 				exit -3
 			fi
 			pset="true"
-			case $2 in
+			case $OPTARG in
 				desktop)
-					platform="desktop";;
+					platform="desktop"
+					;;
 				laptop)
-					platform="laptop";;
+					platform="laptop"
+					;;
 				*)
 					echo "Error: invalid platform." >&2
 					exit -4
 					;;
 			esac
-			shift
+			echo "Building for $platform."
 			;;
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
