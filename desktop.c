@@ -1,27 +1,28 @@
-/********************************************************************
- *                                                                  *
- * desktop.c: Desktop version of batcheck                           *
- * (c) 2013 R. A. Grant (methermeneus@gmail.com)                    *
- * This code is freely available for use and adaptation.            *
- *                                                                  *
- * Dependencies: This program requires access to information        *
- *    by the ACPI tool. To get ACPI on most Linux platforms:        *
- *       $ apt-get install acpi                                     *
- *       $ yum install acpi                                         *
- *       or find the appropriate package for your flavor of Linux   *
- *                                                                  *
- * @TODO: Get info directly from the system's ACPI table, instead   *
- *    of making the ACPI package do all the hard work.              *
- *                                                                  *
- * Purpose: Displays time and core temperature in the upper-right   *
- *    corner of a tty or terminal emulator. Useful for people who,  *
- *    like me, spend a lot of time with a terminal blocking the     *
- *    desktop clock.                                                *
- *                                                                  *
- * Version 1.1: Cleaned up a little. Part of batcheck V 2.0.        *
- * Currently Linux-only. Might work on POSIX-standard systems, but  *
- *    currently untested.                                           *
- *                                                                  *
+/*********************************************************************
+ *                                                                   *
+ * desktop.c: Desktop version of batcheck                            *
+ * (c) 2013 R. A. Grant (methermeneus@gmail.com)                     *
+ * This code is freely available for use and adaptation.             *
+ *                                                                   *
+ * Dependencies: This program requires access to information         *
+ *    by the ACPI tool. To get ACPI on most Linux platforms:         *
+ *       $ apt-get install acpi                                      *
+ *       $ yum install acpi                                          *
+ *       or find the appropriate package for your flavor of Linux    *
+ *                                                                   *
+ * @TODO: Get info directly from the system's ACPI table, instead    *
+ *    of making the ACPI package do all the hard work.               *
+ *                                                                   *
+ * Purpose: Displays time and core temperature in the upper-right    *
+ *    corner of a tty or terminal emulator. Useful for people who,   *
+ *    like me, spend a lot of time with a terminal blocking the      *
+ *    desktop clock.                                                 *
+ * Works best when called by bashrc.                                 *
+ *                                                                   *
+ * Version 1.1: Cleaned up a little. Part of batcheck V 2.0.         *
+ * Currently Linux-only. Might work on POSIX-standard systems, but   *
+ *    currently untested.                                            *
+ *                                                                   *
  ********************************************************************/
 
 #include <stdio.h> // FILE, [f]printf, fgets, fgetc, perror, fflush
@@ -57,7 +58,7 @@ int main (int argc, char *argv[], char *env[]) {
 	// Else, lots of variables.
 	struct tm      *currTime;
 	struct winsize xy;
-	       char    currTimeStr[TIMELEN];
+	       char    timeStr[TIMELEN];
 		   char    tempStr[6];
 	const  char    *tempPath = TEMPFILE;
 	       float   tempC     = 0.0;
@@ -71,7 +72,7 @@ int main (int argc, char *argv[], char *env[]) {
 	while (1) {
 		time (&raw);
 		currTime = localtime (&raw);
-		strftime (currTimeStr, TIMELEN, "%a %b %d, %X", currTime);
+		strftime (timeStr, TIMELEN, "%a %b %d, %X", currTime);
 
 		infoFile = fopen (tempPath, "r");
 		if (infoFile == NULL) {
@@ -84,16 +85,16 @@ int main (int argc, char *argv[], char *env[]) {
 		}
 		fclose (infoFile);
 		tempC = atof (tempStr) / 1000.0;
-		tempF = (tempC + 32) * (9.0 / 5.0);
+		tempF = (tempC + 32.0) * (9.0 / 5.0);
 		
 #ifndef TERMSIZE
 		fprintf (stderr, "Error, could not retrieve terminal size.\n");
 		return (EXIT_FAILURE);
 #endif
 		ioctl (1, TERMSIZE, &xy);
-		x = xy.ws_col - 21;
+		x = xy.ws_col - TIMELEN;
 
-		printf ("\0337\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, currTimeStr);
+		printf ("\0337\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
 		// \033 = escape sequence
 		// 7 = save cursor location
 		// [x;ym = text-style x, color y
