@@ -3,6 +3,7 @@ batcheck
 Linux terminal display for laptop battery life and time.
 (c) November 2008 R. A. Grant
 uploaded to GitHub November 2013
+Revised in February 2017
 Released under GPL v. 2
 
 Displays time and laptop battery life in upper right hand corner of the
@@ -12,8 +13,8 @@ Defaults and Customization
 --------------------------
 Default time format is [%a %b %d, %X]. To change this, in the source,
 search for "strftime (" and change the format there. (You may also need
-to search for "x = xy.ws_col" and change the number there to keep the
-display properly oriented.)
+to search for "TIMELEN" and change the number there to keep the display properly
+oriented.)
 
 Default color is cyan. To change this, in the source, search for "int
 color =" and change the number according to the following chart. To
@@ -67,9 +68,16 @@ BUGS/TODO:
 - [ ] When the cursor is on one of the top two lines, backspacing may
 	 temporarily cause the display line to disappear.
 
-- [ ] Man, do I have a lot of comments, and badly-formatted ones at that. I still actually
-	use this program, but it's weird to see how little I knew about C and code formatting
-	back then. This needs fixing, even if it has nothing to do with the program itself.
+- [ ] Refactor so there aren't two separate laptop and desktop files.
+
+- [ ] Parse ACPI table so we don't depend on the ACPI package.
+
+- [ ] Cross-platform? The display part should be easy, but what about getting the info?
+
+- [x] I went on a bit of a delete-spree! ~~Man, do I have a lot of comments, and
+	badly-formatted ones at that. I still actually use this program, but it's weird to see
+	how little I knew about C and code formatting back then. This needs fixing, even if it
+	has nothing to do with the program itself.~~
 
 ```
 -----BEGIN PGP SIGNATURE-----
