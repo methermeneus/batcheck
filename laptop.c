@@ -30,7 +30,7 @@
 #include <stdlib.h> // atof, NULL, EXIT_FAILURE
 #include <errno.h> // errno
 #include <sys/ioctl.h> // ioctl, struct winsize
-#include <unistd.h> // usleep, daemon, pid_t
+#include <unistd.h> // usleep, daemon, pid_t, access
 #include <string.h> // strerror; Yes, I know strerror isn't threadsafe.
                     // Do you really think this dinky program is going to
                     // implicitly fork threads?
@@ -38,7 +38,9 @@
 
 #define TEMPFILE    "/sys/bus/acpi/devices/LNXTHERM:00/thermal_zone/temp"
 #define TOTALFILE   "/sys/class/power_supply/BAT1/charge_full"
+#define TOTALFILE_OLD   "/sys/class/power_supply/BAT0/charge_full"
 #define CURRENTFILE "/sys/class/power_supply/BAT1/charge_now"
+#define CURRENTFILE_OLD "/sys/class/power_supply/BAT0/charge_now"
 #define ACFILE      "/sys/class/power_supply/ACAD/online"
 #define TIMELEN     21 // Current format, time should be 20 chars.
 #ifdef TIOCGWINSZ
@@ -70,8 +72,12 @@ int main (int argc, char *argv[], char *env[]) {
            char    timeStr[TIMELEN];
            char    tempStr[8]; // @Ambiguous: This means temporary, not temperature.
     const  char    *tempPath       = TEMPFILE;
-    const  char    *maxChargePath  = TOTALFILE;
-    const  char    *currChargePath = CURRENTFILE;
+	// The path to the battery charge files has had several changes in
+	// the last few Linux kernel versions; Checking is a lot easier if
+	// the variables aren't const.  I'm only checking the two latest
+	// paths here; may do more later if it ever comes up. -RAG 20170224
+           char    *maxChargePath  = TOTALFILE;
+           char    *currChargePath = CURRENTFILE;
     const  char    *acPath = ACFILE;
            char    acFlag          = '\0';
            char    suffix          = '\0';
@@ -85,6 +91,25 @@ int main (int argc, char *argv[], char *env[]) {
            int     textStyle       = 1;
            FILE    *infoFile;
            time_t  raw;
+	// Access returns 0 if ok, else -1 and set errno
+	// @TODO: Maybe use preprocessor to query Linux version to set this? -RAG 20170224
+	//        kernel < 2.6.24: /proc/acpi/battery/BAT0/
+	//        2.6.24 <= kernel < 3.19: /sys/class/power_supply/BAT0/
+	//        kernel >= 3.19: /sys/class/power_supply/BAT1/
+	if (access (maxChargePath, R_OK)) {
+		maxChargePath = TOTALFILE_OLD;
+		if (access (maxChargePath, R_OK)) {
+			perror ("Error finding total charge file.\nThis program may not be compatible with your Linux kernel: ");
+			return (errno);
+		}
+	}
+	if (access (currChargePath, R_OK)) {
+		currChargePath = CURRENTFILE_OLD;
+		if (access (currChargePath, R_OK)) {
+			perror ("Error finding current charge file.\nThis program may not be compatible with your Linux kernel: ");
+			return (errno);
+		}
+	}
 
     while (1) {
         time (&raw);
