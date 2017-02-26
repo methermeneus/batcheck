@@ -103,7 +103,7 @@ int main (int argc, char *argv[], char *env[]) {
 		// [nB: move down n lines (default 1)
         printf ("\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
         // [x;ym = text-style x, color y
-		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]\033[0m\0338\033[?25h", TIMELEN - 2, tempC, tempF);
+		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]\033[0m\0338\033[?25h", TIMELEN - (tempF >= 100.0 ? 2 : 3), tempC, tempF);
 		// [nD: move cursor back n spaces (default 1)
         //printf ("\033[2;%dH[%2.1fC] [%3.1F]\033[0m\0338", x, tempC, tempF);
         // [0m = default color and text style

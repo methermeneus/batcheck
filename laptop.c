@@ -195,7 +195,7 @@ int main (int argc, char *argv[], char *env[]) {
         // [y;xH again, down one row
 		printf ("\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
 		// [x;ym = text-style x, color y
-		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]", TIMELEN - 2, tempC, tempF);
+		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]", TIMELEN - (tempF >= 100.0 ? 2 : 3), tempC, tempF);
 		// [nD: move cursor back n spaces (default 1)
         printf ("\033[B\033[%dD[%3d%%%c]\033[0m\0338\033[?25h", TIMELEN - 10, percent, suffix);
         // [0m = default color and text style
