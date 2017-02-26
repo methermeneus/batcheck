@@ -44,7 +44,31 @@
 #include <time.h> // struct tm, time_t, localtime, strftime
 
 #define TIMELEN     21 // Current format, time should be 20 chars.
-#define TEMPFILE    "/sys/bus/acpi/devices/LNXTHERM:00/thermal_zone/temp"
+// This *should* work for most systems, since /sys/class/hwmon is the
+// POSIX standard for where to put this info, and hwmon0 generally
+// symlinks to /sys/devices/virtual/hwmon/hwmon0, and the virtual hwmon
+// seems always to have the same format, which includes temp1_input
+// directly in the hwmon0 folder. Granted, there may be other thermal
+// zones with other temperatures (my desktop has a thermal zone in
+// hwmon2, with consistently different numbers from hwmon0, so I'm
+// certain it's not the same or even an estimated equivalent (hwmon0
+// always ends in 000, so it's obviously not as precise for me)).
+// However, 0 is the only one that's guaranteed, and, while I could
+// certainly check for other thermal zones, I'm not sure how I'd display
+// that. This is specifically meant to be a terminal application that
+// runs in the background, and too much info would clutter the console.
+// I could average all thermal zones together, but that seems unlikely to
+// be worthwhile, given that the temperatures should be similar (my
+// desktop's 0 and 2 are often similar enough that at first I thought 0
+// was a rounded version of 2), many computers (especially laptops) will
+// only ever have one thermal zone, and this is only meant to be a vague
+// warning that things are deteriorating to the point that you should do
+// something before a problem occurs, rather than a precise reading for
+// diagnosing performance. (Kinda like a car's TPMS. Yes, those sensors
+// are precise, but not very accurate. They're there to tell you when
+// something is going wrong, not to give you exact numbers. This is the
+// same idea.)
+#define TEMPFILE    "/sys/class/hwmon/hwmon0/temp1_input"
 // @CLEANUP: Move stuff around so there aren't so many #ifdef LAPTOPs
 // lying around. We should only need... two, I think? We'll see.
 #ifdef LAPTOP // Only a laptop is gonna need battery info.
