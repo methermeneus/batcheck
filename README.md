@@ -23,7 +23,7 @@ change both the foreground and background, you will have to search for
 "\033[1;%d" to "\033[1;x;y", where x and y represent foreground and
 background colors. You can also change the intensity by changing the 1 to
 a different value (0 = normal, 1 = bold, 2 = faint). For other possible
-format values, see http://en.wikipedia.org/wiki/ANSI_escape_code.) Sorry
+format values, see http://en.wikipedia.org/wiki/ANSI_escape_code) Sorry
 it's so complicated, but I wrote this for myself; if this project becomes
 popular, I may make customization easier.
 <table>
