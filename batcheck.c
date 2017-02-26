@@ -1,10 +1,11 @@
 /*********************************************************************
  *                                                                   *
- * laptop.c: Laptop version of batcheck                              *
+ * batcheck.c: Time, core temperature, and battery life terminal     *
+ *     display                                                       *
  * (c) 2017 R. A. Grant (methermeneus@gmail.com)                     *
  *     Adapted from code written in 2008                             *
  * This code is freely available for use and adaptation.             *
- * Filename:  laptop.c                                               *
+ * Filename:  batcheck.c                                             *
  *                                                                   *
  * Dependencies: This program requires access to information         *
  *    by the ACPI tool. To get ACPI on most Linux platforms:         *
@@ -14,6 +15,10 @@
  *                                                                   *
  * @TODO: Get info directly from the system's ACPI table, instead    *
  *    of making the ACPI package do all the hard work.               *
+ * @TODO: Check if the above is relevant, seeing as we're using stuff*
+ *    Linux defines for any info taken from ACPI drivers...          *
+ *    Possibly, reinstall Linux on the laptop and see if this works  *
+ *    without apt-get install acpi?                                  *
  *                                                                   *
  * Purpose: Displays time and core temperature in the upper-right    *
  *    corner of a tty or terminal emulator. Useful for people who,   *
@@ -24,6 +29,8 @@
  * Version 2.0: Massively cleaned up. Part of batcheck V 2.0.        *
  * Currently Linux-only. Might work on POSIX-standard systems, but   *
  *    currently untested.                                            *
+ *
+ *
  *                                                                   *
  ********************************************************************/
 #include <stdio.h> // FILE, [f]printf, fgets, fgetc, perror, fflush
@@ -36,18 +43,17 @@
                     // implicitly fork threads?
 #include <time.h> // struct tm, time_t, localtime, strftime
 
+#define TIMELEN     21 // Current format, time should be 20 chars.
 #define TEMPFILE    "/sys/bus/acpi/devices/LNXTHERM:00/thermal_zone/temp"
+// @CLEANUP: Move stuff around so there aren't so many #ifdef LAPTOPs
+// lying around. We should only need... two, I think? We'll see.
+#ifdef LAPTOP // Only a laptop is gonna need battery info.
 #define TOTALFILE   "/sys/class/power_supply/BAT1/charge_full"
 #define TOTALFILE_OLD   "/sys/class/power_supply/BAT0/charge_full"
 #define CURRENTFILE "/sys/class/power_supply/BAT1/charge_now"
 #define CURRENTFILE_OLD "/sys/class/power_supply/BAT0/charge_now"
 #define ACFILE      "/sys/class/power_supply/ACAD/online"
-#define TIMELEN     21 // Current format, time should be 20 chars.
-#ifdef TIOCGWINSZ
-#define TERMSIZE    TIOCGWINSZ
-#elif defined TIOCGSZ
-#define TERMSIZE    TIOCGSZ
-#endif
+#endif // LAPTOP
 
 /*********************************************************************
  * ACPI files: /sys/class/power_supply/BAT1/                         *
@@ -76,21 +82,25 @@ int main (int argc, char *argv[], char *env[]) {
 	// the last few Linux kernel versions; Checking is a lot easier if
 	// the variables aren't const.  I'm only checking the two latest
 	// paths here; may do more later if it ever comes up. -RAG 20170224
+	// Again, battery stuff is only relevant for laptops.
+#ifdef LAPTOP
            char    *maxChargePath  = TOTALFILE;
            char    *currChargePath = CURRENTFILE;
     const  char    *acPath = ACFILE;
            char    acFlag          = '\0';
            char    suffix          = '\0';
-           float   tempC           = 0.0;
-           float   tempF           = 0.0;
            float   maxCharge       = 0.0;
            float   currCharge      = 0.0;
-           int     x               = 0;
            int     percent         = 0;
+#endif // LAPTOP
+           float   tempC           = 0.0;
+           float   tempF           = 0.0;
+           int     x               = 0;
            int     textColor       = 36;
            int     textStyle       = 1;
            FILE    *infoFile;
            time_t  raw;
+#ifdef LAPTOP
 	// Access returns 0 if ok, else -1 and set errno
 	// @TODO: Maybe use preprocessor to query Linux version to set this? -RAG 20170224
 	//        kernel < 2.6.24: /proc/acpi/battery/BAT0/
@@ -110,7 +120,7 @@ int main (int argc, char *argv[], char *env[]) {
 			return (errno);
 		}
 	}
-
+#endif // LAPTOP
     while (1) {
         time (&raw);
         currTime = localtime (&raw);
@@ -129,6 +139,7 @@ int main (int argc, char *argv[], char *env[]) {
         tempC = atof (tempStr) / 1000.0;
         tempF = (tempC + 32.0) * (9.0 / 5.0);
 
+#ifdef LAPTOP
         // This SHOULD be constant, but I've had crappy laptops where
         // it wasn't, so we want to know where we are in relation to
         // the current maximum.
@@ -173,6 +184,7 @@ int main (int argc, char *argv[], char *env[]) {
         acFlag -= 48; // make 1 or 0 instead of '1' or '0'
         // Mnemonic: I looks like a battery, Z like a lightning bolt.
         suffix = (acFlag ? 'Z' : 'I');
+#endif // LAPTOP
 // Putting the function inside the ifdef helps with terminal window
 // resizing
 #ifdef TIOCGWINSZ
@@ -197,10 +209,17 @@ int main (int argc, char *argv[], char *env[]) {
 		// [x;ym = text-style x, color y
 		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]", TIMELEN - (tempF >= 100.0 ? 2 : 3), tempC, tempF);
 		// [nD: move cursor back n spaces (default 1)
+#ifdef LAPTOP
         printf ("\033[B\033[%dD[%3d%%%c]\033[0m\0338\033[?25h", TIMELEN - 10, percent, suffix);
         // [0m = default color and text style
         // 8 = return to saved cursor location
 		// [?25h = restore cursor
+#else
+		// It feels right to include these in the final printf() call,
+		// but laptop and desktop have different final calls, so tack
+		// this onto the desktop version.
+		printf ("\033[0m\0338\033[?25h");
+#endif // LAPTOP
         fflush (stdout);
         usleep (5000);
     }

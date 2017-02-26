@@ -68,7 +68,7 @@ BUGS/TODO:
 - [ ] When the cursor is on one of the top two lines, backspacing may
 	 temporarily cause the display line to disappear.
 
-- [ ] Refactor so there aren't two separate laptop and desktop files.
+- [x] ~~Refactor so there aren't two separate laptop and desktop files.~~
 
 - [ ] Parse ACPI table so we don't depend on the ACPI package.
 

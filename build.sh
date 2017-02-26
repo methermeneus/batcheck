@@ -3,7 +3,7 @@
 CXX=gcc
 CFLAGS=
 CXXFLAGS=
-LDFLAGS=
+LDFLAGS="-D LAPTOP"
 
 debug=0
 platform="laptop"
@@ -43,6 +43,7 @@ while getopts ":dp:ho:" options; do
 			case $OPTARG in
 				desktop)
 					platform="desktop"
+					LDFLAGS="-U LAPTOP -D DESKTOP"
 					;;
 				laptop)
 					platform="laptop"
@@ -61,6 +62,6 @@ while getopts ":dp:ho:" options; do
 	esac
 done
 
-input="$platform".c
+input="batcheck.c"
 
 $CXX $CFLAGS $CXXFLAGS -o$output $input $LDFLAGS
