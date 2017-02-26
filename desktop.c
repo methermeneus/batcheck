@@ -37,11 +37,6 @@
 
 #define TEMPFILE "/sys/bus/acpi/devices/LNXTHERM:00/thermal_zone/temp"
 #define TIMELEN 21 // Current format, time should be 20 chars.
-#ifdef TIOCGWINSZ
-#define TERMSIZE TIOCGWINSZ
-#elif defined TIOCGSZ
-#define TERMSIZE TIOCGSZ
-#endif
 
 // @TODO: Multi-platform? This thing's so small, I won't need to do much
 // to make it work for Windows or Mac. I'll need to include different
@@ -68,7 +63,7 @@ int main (int argc, char *argv[], char *env[]) {
            int     textStyle = 1;
            FILE    *infoFile;
            time_t  raw;
-
+	
     while (1) {
         time (&raw);
         currTime = localtime (&raw);
@@ -87,26 +82,35 @@ int main (int argc, char *argv[], char *env[]) {
         tempC = atof (tempStr) / 1000.0;
         tempF = (tempC + 32.0) * (9.0 / 5.0);
 
-#ifndef TERMSIZE
+// Putting the function inside the ifdef helps with terminal window
+// resizing
+#ifdef TIOCGWINSZ
+        ioctl (1, TIOCGWINSZ, &xy);
+#elif defined TIOCGSZ
+        ioctl (1, TIOCGSZ, &xy);
+#else
         fprintf (stderr, "Error, could not retrieve terminal size.\n");
         return (EXIT_FAILURE);
 #endif
-        ioctl (1, TERMSIZE, &xy);
         x = xy.ws_col - TIMELEN;
-
-        printf ("\0337\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
+		printf ("\033[?25l\0337\033[1;%dH\033[K\033[B\033[K", x);
         // \033 = escape sequence
+		// [?25l = hide cursor
         // 7 = save cursor location
-        // [x;ym = text-style x, color y
         // [y;xH = position (x,y) (in fixed-width character units, from
         //        origin at top left of screen)
-        x += 4;
-        printf ("\033[2;%dH[%2.1fC] [%2.1F]\033[0m\0338", x, tempC, tempF);
-        // [y;xH again, down one row
+		// [nK: clear in line; 0 (default): cursor to end of line
+		// [nB: move down n lines (default 1)
+        printf ("\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
+        // [x;ym = text-style x, color y
+		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]\033[0m\0338\033[?25h", TIMELEN - 2, tempC, tempF);
+		// [nD: move cursor back n spaces (default 1)
+        //printf ("\033[2;%dH[%2.1fC] [%3.1F]\033[0m\0338", x, tempC, tempF);
         // [0m = default color and text style
         // 8 = return to saved cursor location
+		// [?25h = restore cursor
         fflush (stdout);
-        usleep (250);
+        usleep (5000);
     }
     // If we get here, something went wrong
     fprintf (stderr, "Error, unknown error in info display.\n");

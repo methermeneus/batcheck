@@ -173,31 +173,36 @@ int main (int argc, char *argv[], char *env[]) {
         acFlag -= 48; // make 1 or 0 instead of '1' or '0'
         // Mnemonic: I looks like a battery, Z like a lightning bolt.
         suffix = (acFlag ? 'Z' : 'I');
-
-#ifndef TERMSIZE
+// Putting the function inside the ifdef helps with terminal window
+// resizing
+#ifdef TIOCGWINSZ
+        ioctl (1, TIOCGWINSZ, &xy);
+#elif defined TIOCGSZ
+        ioctl (1, TIOCGSZ, &xy);
+#else
         fprintf (stderr, "Error, could not retrieve terminal size.\n");
         return (EXIT_FAILURE);
 #endif
-        ioctl (1, TERMSIZE, &xy);
         x = xy.ws_col - TIMELEN;
-
-        printf ("\0337\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
+		printf ("\033[?25l\0337\033[1;%dH\033[K\033[B\033[K", x);
         // \033 = escape sequence
+		// [?25l = hide cursor
         // 7 = save cursor location
-        // [x;ym = text-style x, color y
         // [y;xH = position (x,y) (in fixed-width character units, from
         //        origin at top left of screen)
-        // text format 1, color 36 (cyan), first line( from top), xth column (from right), string
-        x += 4; // center smaller text
-        printf ("\033[2;%dH[%2.1fC] [%2.1fF]", x, tempC, tempF);
+		// [nK: clear in line; 0 (default): cursor to end of line
+		// [nB: move down n lines (default 1)
         // [y;xH again, down one row
-        x += 4; // smaller text again
-        printf ("\033[3;%dH[%3d%%%c]\033[0m\0338", x, percent, suffix);
-        // [y;xH one more row down
+		printf ("\033[%d;%dm\033[1;%dH[%s]", textStyle, textColor, x, timeStr);
+		// [x;ym = text-style x, color y
+		printf ("\033[B\033[%dD[%2.1fC] [%3.1fF]", TIMELEN - 2, tempC, tempF);
+		// [nD: move cursor back n spaces (default 1)
+        printf ("\033[B\033[%dD[%3d%%%c]\033[0m\0338\033[?25h", TIMELEN - 10, percent, suffix);
         // [0m = default color and text style
         // 8 = return to saved cursor location
+		// [?25h = restore cursor
         fflush (stdout);
-        usleep (250);
+        usleep (5000);
     }
     // If we get here, there's a problem.
     return (EXIT_FAILURE);
