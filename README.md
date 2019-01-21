@@ -1,3 +1,8 @@
+ARCHIVED 01/20/2019
+===================
+I haven't used this in a year, and it's not exactly an example of my best work, but I don't want to delete it, because it's my first actually _useful_ program. Take this as an example of how far I've come since 2008, especially since it did what I needed it to, so I still used it as-is for almost a decade.
+
+
 batcheck
 ========
 Linux terminal display for laptop battery life and time.
